@@ -1,6 +1,6 @@
-const { info, move } = require("../src/logic");
+import { info, moveResponse } from "../src/logic.js";
 
-function createGameState(myBattlesnake) {
+const createGameState = myBattlesnake => {
   return {
     game: {
       id: "",
@@ -17,9 +17,9 @@ function createGameState(myBattlesnake) {
     },
     you: myBattlesnake,
   };
-}
+};
 
-function createBattlesnake(id, bodyCoords) {
+const createBattlesnake = (id, bodyCoords) => {
   return {
     id: id,
     name: id,
@@ -31,7 +31,7 @@ function createBattlesnake(id, bodyCoords) {
     shout: "",
     squad: "",
   };
-}
+};
 
 describe("Battlesnake API Version", () => {
   test("should be api version 1", () => {
@@ -52,10 +52,10 @@ describe("Battlesnake Moves", () => {
 
     // Act 1,000x (this isn't a great way to test, but it's okay for starting out)
     for (let i = 0; i < 1000; i++) {
-      const moveResponse = move(gameState);
+      const response = moveResponse(gameState);
       // In this state, we should NEVER move left.
       const allowedMoves = ["up", "down", "right"];
-      expect(allowedMoves).toContain(moveResponse.move);
+      expect(allowedMoves).toContain(response.move);
     }
   });
 });

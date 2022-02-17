@@ -5,8 +5,10 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "jest --silent",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "eslint"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BattlesnakeOfficial/starter-snake-javascript.git"

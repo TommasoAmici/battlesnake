@@ -1,4 +1,4 @@
-function info() {
+export const info = () => {
   console.log("INFO");
   const response = {
     apiversion: "1",
@@ -8,15 +8,15 @@ function info() {
     tail: "curled",
   };
   return response;
-}
+};
 
-function start(gameState) {
+export const start = gameState => {
   console.log(`${gameState.game.id} START`);
-}
+};
 
-function end(gameState) {
+export const end = gameState => {
   console.log(`${gameState.game.id} END\n`);
-}
+};
 
 // Weights for moves
 const BEST_MOVE = 1;
@@ -339,7 +339,7 @@ function move(gameState, lookAheadLevel) {
  * Returns body of response for /move endpoint
  * @type {function(import("./types").GameState):import("./types").MoveResponse}
  * */
-const moveResponse = gameState => {
+export const moveResponse = gameState => {
   const { bestMove } = move(gameState, 0);
   const response = {
     move: bestMove,
@@ -347,11 +347,4 @@ const moveResponse = gameState => {
 
   console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}\n`);
   return response;
-};
-
-module.exports = {
-  info: info,
-  start: start,
-  move: moveResponse,
-  end: end,
 };

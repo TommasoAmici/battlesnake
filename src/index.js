@@ -1,5 +1,5 @@
-const express = require("express");
-const { info, start, move, end } = require("./logic");
+import express from "express";
+import { end, info, moveResponse, start } from "./logic.js";
 
 const app = express();
 app.use(express.json());
@@ -19,7 +19,7 @@ app.post("/start", (req, res) => {
 });
 
 app.post("/move", (req, res) => {
-  res.send(move(req.body));
+  res.send(moveResponse(req.body));
 });
 
 app.post("/end", (req, res) => {
