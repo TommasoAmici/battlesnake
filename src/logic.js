@@ -24,6 +24,7 @@ const AVOID = 0;
 const HAZARD = 0.5;
 const HEAD_THREAT = 0.25;
 const ESCAPE_PATH = 0.7;
+const MAX_LOOKAHEAD_LEVEL = 2;
 
 // Minimum weight for a strategic move
 const MIN_STRAT_WEIGHT = ESCAPE_PATH;
@@ -203,7 +204,7 @@ const getClosestFood = gameState => {
  * Look ahead to find better moves. Returns false if move should be avoided
  * @type {function(import("./types").GameState, import("./types").Move, number): boolean}
  */
-const lookAhead = (gameState, nextMove, level = 1) => {
+const lookAhead = (gameState, nextMove, lookAheadLevel = 1) => {
     // calculate game state after nextMove
     const { you } = gameState;
     const { head, body } = you;
@@ -222,7 +223,7 @@ const lookAhead = (gameState, nextMove, level = 1) => {
     const newGameState = { ...gameState, you: { ...you, head: newHead, body: newBody } };
 
     // calculate possible moves in next round
-    const { possibleMoves } = move(newGameState, level);
+    const { possibleMoves } = move(newGameState, lookAheadLevel);
 
     if (!possibleMoves.up && !possibleMoves.down && !possibleMoves.left && !possibleMoves.right) {
         // this move leads to snake's death
@@ -271,7 +272,7 @@ function move(gameState, lookAheadLevel = 0) {
     });
     while (goodMoves.length > 0) {
         const bestMove = goodMoves.pop();
-        if (lookAheadLevel === 0 && lookAhead(gameState)) {
+        if (lookAheadLevel < MAX_LOOKAHEAD_LEVEL && lookAhead(gameState, lookAheadLevel + 1)) {
             return {
                 possibleMoves,
                 bestMove,
