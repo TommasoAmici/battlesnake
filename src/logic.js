@@ -1,13 +1,13 @@
 function info() {
-    console.log("INFO")
+    console.log('INFO');
     const response = {
-        apiversion: "1",
-        author: "",
-        color: "#ff0000",
-        head: "default",
-        tail: "default",
-    }
-    return response
+        apiversion: '1',
+        author: 'Chris/Tommaso',
+        color: '#eac302',
+        head: 'fang',
+        tail: 'curled',
+    };
+    return response;
 }
 
 function start(gameState) {
