@@ -4,7 +4,7 @@
   "description": "A simple Battlesnake written in JavaScript",
   "scripts": {
     "start": "node src/index.js",
-    "test": "jest --silent",
+    "test": "uvu test",
     "format": "prettier --write .",
     "lint": "eslint"
   },
@@ -23,9 +23,9 @@
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
-    "jest": "^27.0.6",
     "lint-staged": "^12.3.4",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "uvu": "^0.5.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,md,html,css,yml}": "prettier --write"
