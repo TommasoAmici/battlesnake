@@ -94,26 +94,31 @@ const socialize = (gameState, possibleMoves) => {
     let biggest = 0;
 
     let closestFood = getClosestFood(gameState, possibleMoves);
-    let targetId = closestFood ? 'food' : 'nothing';
+    let closestSnake = null;
 
     for (const s of gameState.board.snakes) {
         if (gameState.you.id == s.id) {
             continue;
         }
+        if (s.body.length > biggest) {
+            biggest = s.body.length;
+        }
+        console.log(s.id, s.body.length, body.length, biggest);
         for (const otherPart of s.body) {
             isCollision(head, otherPart, possibleMoves);
         }
         if (s.body.length < body.length) {
             // Maybe eat
             const f = {
+                id: s.id,
                 x: s.head.x,
                 y: s.head.y,
             };
             f.dx = f.x - head.x;
             f.dy = f.y - head.y;
             f.d = Math.abs(f.dx) + Math.abs(f.dy);
-            if (!closestFood || closestFood.d > f.d) {
-                closestFood = f.d;
+            if (!closestSnake || closestSnake.d > f.d) {
+                closestSnake = f;
                 targetId = s.id;
             }
         } else {
@@ -122,7 +127,14 @@ const socialize = (gameState, possibleMoves) => {
         }
     }
 
-    console.log('Try to eat', targetId);
+    let target = closestFood;
+
+    if (body.length - biggest > 1 && closestSnake) {
+        console.log('Big enough, go for enemy');
+        target = closestSnake;
+    }
+
+    console.log('Try to eat', target ? target.id : 'nothing');
 
     let goodMoves = [];
     if (closestFood) {
@@ -135,7 +147,6 @@ const socialize = (gameState, possibleMoves) => {
 };
 
 const targetCoord = (gameState, possibleMoves, t) => {
-    // const f = getClosestFood(gameState);
     const goodMoves = [];
     console.log('TARGET', gameState.you.head, t, possibleMoves);
 
@@ -156,6 +167,7 @@ const getClosestFood = gameState => {
     const { head } = gameState.you;
     let closest = null;
     for (const f of gameState.board.food) {
+        f.id = 'food';
         f.dx = f.x - head.x;
         f.dy = f.y - head.y;
         f.d = Math.abs(f.dx) + Math.abs(f.dy);
@@ -262,7 +274,7 @@ const moveResponse = gameState => {
         move: bestMove,
     };
 
-    console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}`);
+    console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}\n`);
     return response;
 };
 
