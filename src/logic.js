@@ -252,7 +252,8 @@ const moveOtherSnake = (gameState, snake) => {
     avoidSelf(gameState, possibleMoves);
     avoidWalls(gameState, possibleMoves);
     avoidHazards(gameState, possibleMoves);
-    const moves = findBestMoves(possibleMoves, []);
+    const strategicMoves = strategize(gameState, possibleMoves);
+    const moves = findBestMoves(possibleMoves, strategicMoves);
     const bestMove = moves.pop();
     return moveSnake(snake, bestMove);
 };
