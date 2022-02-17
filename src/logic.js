@@ -24,7 +24,7 @@ const AVOID = 0;
 const HAZARD = 0.5;
 const HEAD_THREAT = 0.25;
 const ESCAPE_PATH = 0.7;
-const MAX_LOOKAHEAD_LEVEL = 2;
+const MAX_LOOKAHEAD_LEVEL = 1;
 
 // Minimum weight for a strategic move
 const MIN_STRAT_WEIGHT = ESCAPE_PATH;
@@ -118,8 +118,8 @@ const strategize = (gameState, possibleMoves) => {
         }
         console.log(s.id, s.body.length, body.length, biggest);
         // Iterate through the body, including the head but excluding the tail tip
-        for (let i=0; i < s.length - 1; i++) {
-          const otherPart = s.body[i];
+        for (let i = 0; i < s.length - 1; i++) {
+            const otherPart = s.body[i];
             isCollision(head, otherPart, possibleMoves);
         }
         if (s.body.length < body.length) {
