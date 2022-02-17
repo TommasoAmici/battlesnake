@@ -3,10 +3,10 @@ module.exports = {
     browser: false,
     es6: true,
   },
-  extends: ['prettier'],
+  extends: ["prettier"],
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module',
+    sourceType: "module",
   },
-  globals: {}
-}
+  globals: {},
+};
