@@ -5,7 +5,7 @@ function info() {
         author: "",
         color: "#888888",
         head: "default",
-        tail: "default"
+        tail: "default",
     }
     return response
 }
@@ -45,7 +45,7 @@ function move(gameState) {
         up: true,
         down: true,
         left: true,
-        right: true
+        right: true,
     }
 
     // Step 0: Don't let your Battlesnake move back on its own neck
@@ -91,5 +91,5 @@ module.exports = {
     info: info,
     start: start,
     move: move,
-    end: end
+    end: end,
 }
