@@ -50,6 +50,40 @@ const avoidOthers = (gameState, possibleMoves) => {
     }
 }
 
+const targetFood = (gameState, possibleMoves) => {
+  const f = getClosestFood(gameState);
+  const goodMoves = [];
+  if (f) {
+    console.log("EAT", gameState.you.head, f, possibleMoves);
+
+    if (f.dx < 0 && possibleMoves.left) {
+      goodMoves.push("left");
+    } else if (f.dy > 0 && possibleMoves.right) {
+      goodMoves.push("right");
+    }
+    if (f.dy < 0 && possibleMoves.down) {
+      goodMoves.push("down");
+    } else if (f.dy > 0 && possibleMoves.up) {
+      goodMoves.push("up");
+    }
+  }
+  return goodMoves;
+}
+
+const getClosestFood = (gameState) => {
+  const { head } = gameState.you
+  let closest = null;
+  for (const f of gameState.board.food) {
+    f.dx = f.x - head.x
+    f.dy = f.y - head.y
+    f.d = Math.abs(f.dx) + Math.abs(f.dy);
+    if (!closest || closest.d > f.d) {
+      closest = f
+    }
+  }
+  return closest
+}
+
 /** @type {function(import("./types").GameState):import("./types").MoveResponse} */
 function move(gameState) {
     let possibleMoves = {
@@ -63,12 +97,12 @@ function move(gameState) {
     // Step 2 - Don't hit yourself.
     avoidSelf(gameState, possibleMoves)
 
-    console.log(gameState, gameState.you.body);
-
     // TODO: Step 1 - Don't hit walls.
     // Use information in gameState to prevent your Battlesnake from moving beyond the boundaries of the board.
     const boardWidth = gameState.board.width
     const boardHeight = gameState.board.height
+
+    const myHead = gameState.you.head
 
     if (myHead.x === 0) {
       possibleMoves.left = false
@@ -85,14 +119,22 @@ function move(gameState) {
     // Use information in gameState to prevent your Battlesnake from colliding with others.
     avoidOthers(gameState, possibleMoves)
 
-    // TODO: Step 4 - Find food.
-    // Use information in gameState to seek out and find food.
-
     // Finally, choose a move from the available safe moves.
     // TODO: Step 5 - Select a move to make based on strategy, rather than random.
-    const safeMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key])
+    
+    // TODO: Step 4 - Find food.
+    // Use information in gameState to seek out and find food.
+    let goodMoves = targetFood(gameState, possibleMoves);
+    console.log("good moves", goodMoves);
+
+    if (!goodMoves.length) {
+      // Fall back to any safe move
+      console.log("Fallback", possibleMoves);
+      goodMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key])
+    }
+
     const response = {
-        move: safeMoves[Math.floor(Math.random() * safeMoves.length)],
+        move: goodMoves[Math.floor(Math.random() * goodMoves.length)],
     }
 
     console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}`)
