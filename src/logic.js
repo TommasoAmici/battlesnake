@@ -69,20 +69,34 @@ const avoidHazards = (gameState, possibleMoves) => {
 
 /** @type {function(import("./types").GameState, PossibleMoves):void} */
 const avoidWalls = (gameState, possibleMoves) => {
-    const boardWidth = gameState.board.width;
-    const boardHeight = gameState.board.height;
     const { head } = gameState.you;
-    if (head.x === 0) {
+    const bottomWall = 0;
+    const leftWall = 0;
+    const rightWall = gameState.board.width;
+    const topWall = gameState.board.height;
+    if (head.x === leftWall) {
         possibleMoves.left = AVOID;
-    } else if (head.x === boardWidth - 1) {
+    } else if (head.x === rightWall - 1) {
         possibleMoves.right = AVOID;
     }
-    if (head.y === 0) {
+    if (head.y === bottomWall) {
         possibleMoves.down = AVOID;
-    } else if (head.y === boardHeight - 1) {
+    } else if (head.y === topWall - 1) {
         possibleMoves.up = AVOID;
     }
     console.log('> avoidWalls', possibleMoves);
+
+    if (head.x === leftWall + 1) {
+        possibleMoves.left *= ESCAPE_PATH;
+    } else if (head.x === rightWall - 2) {
+        possibleMoves.right *= ESCAPE_PATH;
+    }
+    if (head.y === bottomWall + 1) {
+        possibleMoves.down *= ESCAPE_PATH;
+    } else if (head.y === topWall - 2) {
+        possibleMoves.up *= ESCAPE_PATH;
+    }
+    console.log('> leave escape path', possibleMoves);
 };
 
 /** @type {function(import("./types").GameState, PossibleMoves):Array} */
