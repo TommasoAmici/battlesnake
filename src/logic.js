@@ -134,7 +134,7 @@ const lookAhead = (gameState, nextMove) => {
     const newGameState = { ...gameState, you: { ...you, head: newHead, body: newBody } }
 
     // calculate possible moves in next round
-    const { nextMove, possibleMoves } = move(newGameState)
+    const { possibleMoves } = move(newGameState)
 
     if (!possibleMoves.up && !possibleMoves.down && !possibleMoves.left && !possibleMoves.right) {
         // this move leads to snake's death
