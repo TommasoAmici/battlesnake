@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "A simple Battlesnake written in JavaScript",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "uvu test",
+    "build": "ncc build src/index.js --out dist --minify --no-cache",
     "format": "prettier --write .",
-    "lint": "eslint"
+    "lint": "eslint",
+    "start": "node src/index.js",
+    "test": "uvu test"
   },
   "type": "module",
   "repository": {
@@ -20,6 +21,7 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "@vercel/ncc": "^0.33.3",
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
