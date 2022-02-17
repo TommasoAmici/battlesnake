@@ -2,6 +2,14 @@
   "name": "starter-snake-javascript",
   "version": "1.0.0",
   "description": "A simple Battlesnake written in JavaScript",
+  "homepage": "https://github.com/BattlesnakeOfficial/starter-snake-javascript#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BattlesnakeOfficial/starter-snake-javascript.git"
+  },
+  "license": "MIT",
+  "author": "BattlesnakeOfficial",
+  "type": "module",
   "scripts": {
     "build": "ncc build src/index.js --out dist --minify --no-cache",
     "format": "prettier --write .",
@@ -9,14 +17,9 @@
     "start": "node src/index.js",
     "test": "uvu test"
   },
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BattlesnakeOfficial/starter-snake-javascript.git"
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,html,css,yml}": "prettier --write"
   },
-  "author": "BattlesnakeOfficial",
-  "license": "MIT",
-  "homepage": "https://github.com/BattlesnakeOfficial/starter-snake-javascript#readme",
   "dependencies": {
     "express": "^4.17.1"
   },
@@ -28,8 +31,5 @@
     "lint-staged": "^12.3.4",
     "prettier": "^2.5.1",
     "uvu": "^0.5.3"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,md,html,css,yml}": "prettier --write"
   }
 }
