@@ -111,6 +111,38 @@ const getClosestFood = gameState => {
     return closest
 }
 
+/**
+ * Look ahead to find better moves. Returns false if move should be avoided
+ * @type {function(import("./types").GameState, function(import("./types").Move): boolean}
+ */
+const lookAhead = (gameState, nextMove) => {
+    // calculate game state after nextMove
+    const { you } = gameState
+    const { head, body } = you
+    const newHead = head
+    if (nextMove === "right") {
+        newHead.x += 1
+    } else if (nextMove === "left") {
+        newHead.x -= 1
+    } else if (nextMove === "up") {
+        newHead.y += 1
+    } else if (nextMove === "down") {
+        newHead.y -= 1
+    }
+    // the tail moves up by one position, the head is now newHead
+    const newBody = [newHead, ...body.splice(-1)]
+    const newGameState = { ...gameState, you: { ...you, head: newHead, body: newBody } }
+
+    // calculate possible moves in next round
+    const { possibleMoves } = move(newGameState)
+
+    if (!possibleMoves.up && !possibleMoves.down && !possibleMoves.left && !possibleMoves.right) {
+        // this move leads to snake's death
+        return false
+    }
+    return true
+}
+
 /** @type {function(import("./types").GameState):import("./types").MoveResponse} */
 function move(gameState) {
     let possibleMoves = {
@@ -147,9 +179,28 @@ function move(gameState) {
         console.log("Fallback", possibleMoves)
         goodMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key])
     }
+    while (goodMoves.length > 0) {
+        const nextMoveIndex = Math.floor(Math.random() * goodMoves.length)
+        const nextMove = goodMoves[nextMoveIndex]
+        // remove nextMove from goodMoves
+        goodMoves = goodMoves.splice(nextMoveIndex, 1)
+        if (lookAhead(gameState)) {
+            return {
+                possibleMoves,
+                nextMove,
+            }
+        }
+    }
+}
 
+/**
+ * Returns body of response for /move endpoint
+ * @type {function(import("./types").GameState):import("./types").MoveResponse}
+ * */
+const moveResponse = gameState => {
+    const { nextMove } = move(gameState)
     const response = {
-        move: goodMoves[Math.floor(Math.random() * goodMoves.length)],
+        move: nextMove,
     }
 
     console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}`)
@@ -159,6 +210,6 @@ function move(gameState) {
 module.exports = {
     info: info,
     start: start,
-    move: move,
+    move: moveResponse,
     end: end,
 }
