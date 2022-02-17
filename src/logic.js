@@ -22,21 +22,22 @@ function end(gameState) {
 const BEST_MOVE = 1;
 const AVOID = 0;
 const HAZARD = 0.5;
+const HEAD_THREAT = 0.25;
 
 /** @type {function(import("./types").Coord, import("./types").Coord, PossibleMoves):boolean} */
 const isCollision = (head, coord, possibleMoves, weight = 0) => {
     if (coord.y == head.y) {
         if (coord.x === head.x + 1) {
-            possibleMoves.right = weight;
+            possibleMoves.right *= weight;
         } else if (coord.x === head.x - 1) {
-            possibleMoves.left = weight;
+            possibleMoves.left *= weight;
         }
     }
     if (coord.x == head.x) {
         if (coord.y === head.y + 1) {
-            possibleMoves.up = weight;
+            possibleMoves.up *= weight;
         } else if (coord.y === head.y - 1) {
-            possibleMoves.down = weight;
+            possibleMoves.down *= weight;
         }
     }
 };
@@ -122,8 +123,18 @@ const socialize = (gameState, possibleMoves) => {
                 targetId = s.id;
             }
         } else {
-            // Avoid head
+            // Avoid current head, will be body next move
             isCollision(head, s.head, possibleMoves);
+
+            // Soft avoid possible next head locations
+            const l = { x: s.head.x - 1, y: s.head.y };
+            isCollision(head, l, possibleMoves, HEAD_THREAT);
+            const r = { x: s.head.x + 1, y: s.head.y };
+            isCollision(head, r, possibleMoves, HEAD_THREAT);
+            const u = { x: s.head.x, y: s.head.y + 1 };
+            isCollision(head, u, possibleMoves, HEAD_THREAT);
+            const d = { x: s.head.x, y: s.head.y - 1 };
+            isCollision(head, d, possibleMoves, HEAD_THREAT);
         }
     }
 
