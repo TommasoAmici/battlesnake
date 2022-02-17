@@ -257,9 +257,9 @@ function move(gameState, lookAheadLevel = 0) {
  * @type {function(import("./types").GameState):import("./types").MoveResponse}
  * */
 const moveResponse = gameState => {
-    const { nextMove } = move(gameState);
+    const { bestMove } = move(gameState);
     const response = {
-        move: nextMove,
+        move: bestMove,
     };
 
     console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}`);
