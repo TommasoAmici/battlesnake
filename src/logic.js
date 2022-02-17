@@ -9,9 +9,13 @@ export const info = () => {
   return response;
 };
 
-export const start = gameState => {};
+export const start = () => {
+  console.info("Battle start");
+};
 
-export const end = gameState => {};
+export const end = () => {
+  console.info("Battle end");
+};
 
 // Weights for moves
 const BEST_MOVE = 1;
@@ -127,7 +131,6 @@ const strategize = (gameState, possibleMoves) => {
       f.d = Math.abs(f.dx) + Math.abs(f.dy);
       if (!closestSnake || closestSnake.d > f.d) {
         closestSnake = f;
-        targetId = s.id;
       }
     } else {
       // Soft avoid possible next head locations

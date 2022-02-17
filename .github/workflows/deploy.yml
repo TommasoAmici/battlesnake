@@ -21,6 +21,12 @@ jobs:
       - name: Dependencies
         run: yarn --immutable
 
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
       - name: Build
         run: yarn build
 

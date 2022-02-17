@@ -1,4 +1,5 @@
 import express from "express";
+import process from "process";
 import { end, info, moveResponse, start } from "./logic.js";
 
 const app = express();
