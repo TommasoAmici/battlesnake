@@ -39,6 +39,17 @@ const avoidSelf = (gameState, possibleMoves) => {
     }
 }
 
+/** @type {function(import("./types").GameState, Object):void} */
+const avoidOthers = (gameState, possibleMoves) => {
+    const { head } = gameState.you
+    const { snakes } = gameState.board
+    for (const snake of snakes) {
+        for (const bodyPart of snake.body) {
+            isCollision(head, bodyPart, possibleMoves)
+        }
+    }
+}
+
 /** @type {function(import("./types").GameState):import("./types").MoveResponse} */
 function move(gameState) {
     let possibleMoves = {
@@ -72,6 +83,7 @@ function move(gameState) {
 
     // TODO: Step 3 - Don't collide with others.
     // Use information in gameState to prevent your Battlesnake from colliding with others.
+    avoidOthers(gameState, possibleMoves)
 
     // TODO: Step 4 - Find food.
     // Use information in gameState to seek out and find food.
