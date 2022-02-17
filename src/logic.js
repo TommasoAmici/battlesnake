@@ -1,5 +1,4 @@
 export const info = () => {
-  console.log("INFO");
   const response = {
     apiversion: "1",
     author: "Chris/Tommaso",
@@ -10,13 +9,9 @@ export const info = () => {
   return response;
 };
 
-export const start = gameState => {
-  console.log(`${gameState.game.id} START`);
-};
+export const start = gameState => {};
 
-export const end = gameState => {
-  console.log(`${gameState.game.id} END\n`);
-};
+export const end = gameState => {};
 
 // Weights for moves
 const BEST_MOVE = 1;
@@ -53,7 +48,6 @@ const avoidSelf = (gameState, possibleMoves) => {
   for (const bodyPart of body) {
     isCollision(head, bodyPart, possibleMoves);
   }
-  console.log("> avoidSelf", possibleMoves);
 };
 
 /**
@@ -86,7 +80,6 @@ const avoidWalls = (gameState, possibleMoves) => {
   } else if (head.y === topWall - 1) {
     possibleMoves.up = AVOID;
   }
-  console.log("> avoidWalls", possibleMoves);
 
   if (head.x === leftWall + 1) {
     possibleMoves.left *= ESCAPE_PATH;
@@ -98,7 +91,6 @@ const avoidWalls = (gameState, possibleMoves) => {
   } else if (head.y === topWall - 2) {
     possibleMoves.up *= ESCAPE_PATH;
   }
-  console.log("> leave escape path", possibleMoves);
 };
 
 /** @type {function(import("./types").GameState, PossibleMoves):Array} */
@@ -153,25 +145,20 @@ const strategize = (gameState, possibleMoves) => {
   let target = closestFood;
 
   if (body.length - biggest > 1 && closestSnake) {
-    console.log("Big enough, go for enemy");
+    // Big enough, go for enemy
     target = closestSnake;
   }
-
-  console.log("Try to eat", target ? target.id : "nothing");
 
   let goodMoves = [];
   if (target) {
     goodMoves = targetCoord(gameState, possibleMoves, target);
   }
 
-  console.log("good moves", goodMoves);
-
   return goodMoves;
 };
 
 const targetCoord = (gameState, possibleMoves, t) => {
   const goodMoves = [];
-  console.log("TARGET", gameState.you.head, t, possibleMoves);
 
   if (t.dx < 0 && possibleMoves.left >= MIN_STRAT_WEIGHT) {
     goodMoves.push("left");
@@ -208,7 +195,6 @@ const findBestMoves = (possible, strategic) => {
   let moves = strategic;
   if (!strategic.length) {
     // Fall back to any safe move
-    console.log("Fallback", possible);
     moves = Object.keys(possible).filter(key => possible[key] > AVOID);
   }
   // sort moves in ascending order of preference, worst move to best move
@@ -345,6 +331,5 @@ export const moveResponse = gameState => {
     move: bestMove,
   };
 
-  console.log(`${gameState.game.id} MOVE ${gameState.turn}: ${response.move}\n`);
   return response;
 };
