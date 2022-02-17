@@ -14,7 +14,10 @@
   "license": "MIT",
   "homepage": "https://github.com/BattlesnakeOfficial/starter-snake-javascript#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "eslint": "^8.9.0",
+    "eslint-config-prettier": "^8.3.0",
+    "express": "^4.17.1",
+    "standard": "^16.0.4"
   },
   "devDependencies": {
     "jest": "^27.0.6"
