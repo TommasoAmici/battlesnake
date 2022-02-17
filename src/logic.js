@@ -142,9 +142,9 @@ const getClosestFood = gameState => {
 
 /**
  * Look ahead to find better moves. Returns false if move should be avoided
- * @type {function(import("./types").GameState, function(import("./types").Move): boolean}
+ * @type {function(import("./types").GameState, import("./types").Move, number): boolean}
  */
-const lookAhead = (gameState, nextMove) => {
+const lookAhead = (gameState, nextMove, level = 1) => {
     // calculate game state after nextMove
     const { you } = gameState
     const { head, body } = you
@@ -163,7 +163,7 @@ const lookAhead = (gameState, nextMove) => {
     const newGameState = { ...gameState, you: { ...you, head: newHead, body: newBody } }
 
     // calculate possible moves in next round
-    const { possibleMoves } = move(newGameState)
+    const { possibleMoves } = move(newGameState, level)
 
     if (!possibleMoves.up && !possibleMoves.down && !possibleMoves.left && !possibleMoves.right) {
         // this move leads to snake's death
@@ -173,7 +173,7 @@ const lookAhead = (gameState, nextMove) => {
 }
 
 /** @type {function(import("./types").GameState):import("./types").MoveResponse} */
-function move(gameState) {
+function move(gameState, lookAheadLevel = 0) {
     let possibleMoves = {
         up: true,
         down: true,
@@ -209,7 +209,12 @@ function move(gameState) {
         const nextMove = goodMoves[nextMoveIndex]
         // remove nextMove from goodMoves
         goodMoves = goodMoves.splice(nextMoveIndex, 1)
-        if (lookAhead(gameState)) {
+        if (lookAheadLevel <= 1 && lookAhead(gameState)) {
+            return {
+                possibleMoves,
+                nextMove,
+            }
+        } else {
             return {
                 possibleMoves,
                 nextMove,
