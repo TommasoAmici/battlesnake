@@ -278,11 +278,16 @@ const lookAhead = (gameState, nextMove, lookAheadLevel) => {
     };
 
     // calculate possible moves in next round
-    const { possibleMoves } = move(newGameState, lookAheadLevel);
+    const { possibleMoves, strategicMoves } = move(newGameState, lookAheadLevel);
 
-    if (!possibleMoves.up && !possibleMoves.down && !possibleMoves.left && !possibleMoves.right) {
+    if (possibleMoves.up === 0 && possibleMoves.down === 0 && possibleMoves.left === 0 && possibleMoves.right === 0) {
         // this move leads to snake's death
         return false;
+    }
+    const moves = findBestMoves(possibleMoves, strategicMoves);
+    const bestMove = moves.pop();
+    if (lookAheadLevel < MAX_LOOKAHEAD_LEVEL) {
+        return lookAhead(gameState, bestMove, lookAheadLevel + 1);
     }
     return true;
 };
@@ -307,11 +312,13 @@ function move(gameState, lookAheadLevel) {
         const bestMove = moves.pop();
         if (lookAheadLevel < MAX_LOOKAHEAD_LEVEL && lookAhead(gameState, bestMove, lookAheadLevel + 1)) {
             return {
+                strategicMoves,
                 possibleMoves,
                 bestMove,
             };
         } else {
             return {
+                strategicMoves,
                 possibleMoves,
                 bestMove,
             };
