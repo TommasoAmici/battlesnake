@@ -163,7 +163,7 @@ const targetCoord = (gameState, possibleMoves, t) => {
 
     if (t.dx < 0 && possibleMoves.left) {
         goodMoves.push('left');
-    } else if (t.dy > 0 && possibleMoves.right) {
+    } else if (t.dx > 0 && possibleMoves.right) {
         goodMoves.push('right');
     }
     if (t.dy < 0 && possibleMoves.down) {
