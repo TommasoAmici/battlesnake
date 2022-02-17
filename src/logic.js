@@ -51,10 +51,6 @@ const avoidSelf = (gameState, possibleMoves) => {
     console.log('> avoidSelf', possibleMoves);
 };
 
-const onlyUnique = (value, index, self) => {
-    return self.indexOf(value) === index;
-};
-
 /**
  * Some game modes contain hazards that should be avoided.
  * Food can be listed in hazards.
@@ -62,11 +58,8 @@ const onlyUnique = (value, index, self) => {
  */
 const avoidHazards = (gameState, possibleMoves) => {
     const { head } = gameState.you;
-    const { hazards, food } = gameState.board;
-    const merged = [...hazards, ...food];
-    const nonFood = merged.filter(onlyUnique);
-
-    for (const hazard of nonFood) {
+    const { hazards } = gameState.board;
+    for (const hazard of hazards) {
         isCollision(head, hazard, possibleMoves, HAZARD);
     }
 };
