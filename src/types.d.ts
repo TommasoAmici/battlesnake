@@ -9,8 +9,10 @@ export interface InfoResponse {
   version?: string
 }
 
+export type Move = "up" | "down" | "left" | "right" | string
+
 export interface MoveResponse {
-  move: string
+  move: Move
   shout?: string
 }
 
