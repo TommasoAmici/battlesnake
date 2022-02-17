@@ -18,6 +18,28 @@ function end(gameState) {
     console.log(`${gameState.game.id} END\n`)
 }
 
+/** @type {function(import("./types").Coord, import("./types").Coord, Object):boolean} */
+const isCollision = (head, coord, possibleMoves) => {
+    if (coord.x === head.x + 1) {
+        possibleMoves.right = false
+    } else if (coord.x === head.x - 1) {
+        possibleMoves.left = false
+    } else if (coord.y === head.y + 1) {
+        possibleMoves.up = false
+    } else if (coord.y === head.y - 1) {
+        possibleMoves.down = false
+    }
+}
+
+/** @type {function(import("./types").GameState, Object):void} */
+const avoidSelf = (gameState, possibleMoves) => {
+    const { head, body } = gameState.you
+    for (const bodyPart of body) {
+        isCollision(head, bodyPart, possibleMoves)
+    }
+}
+
+/** @type {function(import("./types").GameState):import("./types").MoveResponse} */
 function move(gameState) {
     let possibleMoves = {
         up: true,
@@ -27,17 +49,8 @@ function move(gameState) {
     }
 
     // Step 0: Don't let your Battlesnake move back on its own neck
-    const myHead = gameState.you.head
-    const myNeck = gameState.you.body[1]
-    if (myNeck.x < myHead.x) {
-        possibleMoves.left = false
-    } else if (myNeck.x > myHead.x) {
-        possibleMoves.right = false
-    } else if (myNeck.y < myHead.y) {
-        possibleMoves.down = false
-    } else if (myNeck.y > myHead.y) {
-        possibleMoves.up = false
-    }
+    // Step 2 - Don't hit yourself.
+    avoidSelf(gameState, possibleMoves)
 
     console.log(gameState, gameState.you.body);
 
@@ -56,10 +69,6 @@ function move(gameState) {
     } else if (myHead.y === boardHeight - 1) {
       possibleMoves.up = false
     }
-
-    // TODO: Step 2 - Don't hit yourself.
-    // Use information in gameState to prevent your Battlesnake from colliding with itself.
-    // const mybody = gameState.you.body
 
     // TODO: Step 3 - Don't collide with others.
     // Use information in gameState to prevent your Battlesnake from colliding with others.
