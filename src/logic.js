@@ -73,7 +73,6 @@ const socialize = (gameState, possibleMoves) => {
         if (gameState.you.id == s.id) {
             continue;
         }
-        const otherSize = s.body.length;
         for (const otherPart of s.body) {
             isCollision(head, otherPart, possibleMoves);
         }
