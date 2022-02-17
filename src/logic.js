@@ -26,7 +26,7 @@ const HEAD_THREAT = 0.25;
 const ESCAPE_PATH = 0.7;
 
 // Minimum weight for a strategic move
-const MIN_STRAT_WEIGHT = 1;
+const MIN_STRAT_WEIGHT = ESCAPE_PATH;
 
 /** @type {function(import("./types").Coord, import("./types").Coord, PossibleMoves):boolean} */
 const isCollision = (head, coord, possibleMoves, weight = 0) => {
