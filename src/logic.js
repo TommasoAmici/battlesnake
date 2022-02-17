@@ -18,25 +18,30 @@ function end(gameState) {
     console.log(`${gameState.game.id} END\n`);
 }
 
-/** @type {function(import("./types").Coord, import("./types").Coord, Object):boolean} */
-const isCollision = (head, coord, possibleMoves) => {
+// Weights for moves
+const BEST_MOVE = 1;
+const AVOID = 0;
+const HAZARD = 0.5;
+
+/** @type {function(import("./types").Coord, import("./types").Coord, PossibleMoves):boolean} */
+const isCollision = (head, coord, possibleMoves, weight = 0) => {
     if (coord.y == head.y) {
         if (coord.x === head.x + 1) {
-            possibleMoves.right = false;
+            possibleMoves.right = weight;
         } else if (coord.x === head.x - 1) {
-            possibleMoves.left = false;
+            possibleMoves.left = weight;
         }
     }
     if (coord.x == head.x) {
         if (coord.y === head.y + 1) {
-            possibleMoves.up = false;
+            possibleMoves.up = weight;
         } else if (coord.y === head.y - 1) {
-            possibleMoves.down = false;
+            possibleMoves.down = weight;
         }
     }
 };
 
-/** @type {function(import("./types").GameState, Object):void} */
+/** @type {function(import("./types").GameState, PossibleMoves):void} */
 const avoidSelf = (gameState, possibleMoves) => {
     const { head, body } = gameState.you;
     for (const bodyPart of body) {
@@ -45,23 +50,45 @@ const avoidSelf = (gameState, possibleMoves) => {
     console.log('> avoidSelf', possibleMoves);
 };
 
+const onlyUnique = (value, index, self) => {
+    return self.indexOf(value) === index;
+};
+
+/**
+ * Some game modes contain hazards that should be avoided.
+ * Food can be listed in hazards.
+ * @type {function(import("./types").GameState, PossibleMoves):void}
+ */
+const avoidHazards = (gameState, possibleMoves) => {
+    const { head } = gameState.you;
+    const { hazards, food } = gameState.board;
+    const merged = [...hazards, ...food];
+    const nonFood = merged.filter(onlyUnique);
+
+    for (const hazard of nonFood) {
+        isCollision(head, hazard, possibleMoves, HAZARD);
+    }
+};
+
+/** @type {function(import("./types").GameState, PossibleMoves):void} */
 const avoidWalls = (gameState, possibleMoves) => {
     const boardWidth = gameState.board.width;
     const boardHeight = gameState.board.height;
     const { head } = gameState.you;
     if (head.x === 0) {
-        possibleMoves.left = false;
+        possibleMoves.left = AVOID;
     } else if (head.x === boardWidth - 1) {
-        possibleMoves.right = false;
+        possibleMoves.right = AVOID;
     }
     if (head.y === 0) {
-        possibleMoves.down = false;
+        possibleMoves.down = AVOID;
     } else if (head.y === boardHeight - 1) {
-        possibleMoves.up = false;
+        possibleMoves.up = AVOID;
     }
     console.log('> avoidWalls', possibleMoves);
 };
 
+/** @type {function(import("./types").GameState, PossibleMoves):Array} */
 const socialize = (gameState, possibleMoves) => {
     const { head, body } = gameState.you;
     let biggest = 0;
@@ -174,10 +201,10 @@ const lookAhead = (gameState, nextMove, level = 1) => {
 /** @type {function(import("./types").GameState):import("./types").MoveResponse} */
 function move(gameState, lookAheadLevel = 0) {
     let possibleMoves = {
-        up: true,
-        down: true,
-        left: true,
-        right: true,
+        up: BEST_MOVE,
+        down: BEST_MOVE,
+        left: BEST_MOVE,
+        right: BEST_MOVE,
     };
 
     // Step 0: Don't let your Battlesnake move back on its own neck
@@ -187,6 +214,7 @@ function move(gameState, lookAheadLevel = 0) {
     // TODO: Step 1 - Don't hit walls.
     // Use information in gameState to prevent your Battlesnake from moving beyond the boundaries of the board.
     avoidWalls(gameState, possibleMoves);
+    avoidHazards(gameState, possibleMoves);
 
     // TODO: Step 3 - Don't collide with others.
     // TODO: Step 4 - Find food.
@@ -201,22 +229,24 @@ function move(gameState, lookAheadLevel = 0) {
     if (!goodMoves.length) {
         // Fall back to any safe move
         console.log('Fallback', possibleMoves);
-        goodMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key]);
+        goodMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key] > AVOID);
     }
+    // sort moves in ascending order of preference
+    // worst move to best move
+    goodMoves.sort((a, b) => {
+        return possibleMoves[a] - possibleMoves[b];
+    });
     while (goodMoves.length > 0) {
-        const nextMoveIndex = Math.floor(Math.random() * goodMoves.length);
-        const nextMove = goodMoves[nextMoveIndex];
-        // remove nextMove from goodMoves
-        goodMoves = goodMoves.splice(nextMoveIndex, 1);
+        const bestMove = goodMoves.pop();
         if (lookAheadLevel === 0 && lookAhead(gameState)) {
             return {
                 possibleMoves,
-                nextMove,
+                bestMove,
             };
         } else {
             return {
                 possibleMoves,
-                nextMove,
+                bestMove,
             };
         }
     }
