@@ -23,6 +23,7 @@ const BEST_MOVE = 1;
 const AVOID = 0;
 const HAZARD = 0.5;
 const HEAD_THREAT = 0.25;
+const ESCAPE_PATH = 0.7;
 
 // Minimum weight for a strategic move
 const MIN_STRAT_WEIGHT = 1;
