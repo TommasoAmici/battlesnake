@@ -209,7 +209,7 @@ function move(gameState, lookAheadLevel = 0) {
         const nextMove = goodMoves[nextMoveIndex]
         // remove nextMove from goodMoves
         goodMoves = goodMoves.splice(nextMoveIndex, 1)
-        if (lookAheadLevel <= 1 && lookAhead(gameState)) {
+        if (lookAheadLevel === 0 && lookAhead(gameState)) {
             return {
                 possibleMoves,
                 nextMove,
