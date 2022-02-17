@@ -116,7 +116,9 @@ const strategize = (gameState, possibleMoves) => {
             biggest = s.body.length;
         }
         console.log(s.id, s.body.length, body.length, biggest);
-        for (const otherPart of s.body) {
+        // Iterate through the body, including the head but excluding the tail tip
+        for (let i=0; i < s.length - 1; i++) {
+          const otherPart = s.body[i];
             isCollision(head, otherPart, possibleMoves);
         }
         if (s.body.length < body.length) {
@@ -134,9 +136,6 @@ const strategize = (gameState, possibleMoves) => {
                 targetId = s.id;
             }
         } else {
-            // Avoid current head, will be body next move
-            isCollision(head, s.head, possibleMoves);
-
             // Soft avoid possible next head locations
             const l = { x: s.head.x - 1, y: s.head.y };
             isCollision(head, l, possibleMoves, HEAD_THREAT);
