@@ -116,11 +116,12 @@ const strategize = (gameState, possibleMoves) => {
         if (s.body.length > biggest) {
             biggest = s.body.length;
         }
-        console.log(s.id, s.body.length, body.length, biggest);
         // Iterate through the body, including the head but excluding the tail tip
         for (let i = 0; i < s.length - 1; i++) {
             const otherPart = s.body[i];
-            isCollision(head, otherPart, possibleMoves);
+            if (otherPart !== undefined) {
+                isCollision(head, otherPart, possibleMoves);
+            }
         }
         if (s.body.length < body.length) {
             // Maybe eat
@@ -201,13 +202,27 @@ const getClosestFood = gameState => {
 };
 
 /**
- * Look ahead to find better moves. Returns false if move should be avoided
- * @type {function(import("./types").GameState, import("./types").Move, number): boolean}
+ * @type {function(import("./types").PossibleMoves, import("./types").Move[]): import("./types").Move[]}
  */
-const lookAhead = (gameState, nextMove, lookAheadLevel) => {
-    // calculate game state after nextMove
-    const { you } = gameState;
-    const { head, body } = you;
+const findBestMoves = (possible, strategic) => {
+    let moves = strategic;
+    if (!strategic.length) {
+        // Fall back to any safe move
+        console.log('Fallback', possible);
+        moves = Object.keys(possible).filter(key => possible[key] > AVOID);
+    }
+    // sort moves in ascending order of preference, worst move to best move
+    moves.sort((a, b) => {
+        return possible[a] - possible[b];
+    });
+    return moves;
+};
+
+/**
+ * @type {function(import("./types").Battlesnake, import("./types").Move): import("./types").Battlesnake}
+ */
+const moveSnake = (snake, nextMove) => {
+    const { head, body } = snake;
     const newHead = head;
     if (nextMove === 'right') {
         newHead.x += 1;
@@ -220,7 +235,47 @@ const lookAhead = (gameState, nextMove, lookAheadLevel) => {
     }
     // the tail moves up by one position, the head is now newHead
     const newBody = [newHead, ...body.splice(-1)];
-    const newGameState = { ...gameState, you: { ...you, head: newHead, body: newBody } };
+    return { ...snake, head: newHead, body: newBody };
+};
+
+/**
+ * Move other snakes to predict next mvoes
+ * @type {function(import("./types").GameState, import("./types").Battlesnake): import("./types").Battlesnake}
+ */
+const moveOtherSnake = (gameState, snake) => {
+    let possibleMoves = {
+        up: BEST_MOVE,
+        down: BEST_MOVE,
+        left: BEST_MOVE,
+        right: BEST_MOVE,
+    };
+    avoidSelf(gameState, possibleMoves);
+    avoidWalls(gameState, possibleMoves);
+    avoidHazards(gameState, possibleMoves);
+    const moves = findBestMoves(possibleMoves, []);
+    const bestMove = moves.pop();
+    return moveSnake(snake, bestMove);
+};
+
+/**
+ * Look ahead to find better moves. Returns false if move should be avoided
+ * @type {function(import("./types").GameState, import("./types").Move, number): boolean}
+ */
+const lookAhead = (gameState, nextMove, lookAheadLevel) => {
+    // calculate game state after nextMove
+    const { you, board } = gameState;
+    const newYou = moveSnake(you, nextMove);
+
+    // move other snakes
+    const otherSnakes = board.snakes
+        .filter(snake => snake.id !== you.id)
+        .map(snake => moveOtherSnake(gameState, snake));
+
+    const newGameState = {
+        ...gameState,
+        you: newYou,
+        board: { ...board, snakes: [newYou, ...otherSnakes] },
+    };
 
     // calculate possible moves in next round
     const { possibleMoves } = move(newGameState, lookAheadLevel);
@@ -246,19 +301,10 @@ function move(gameState, lookAheadLevel) {
     avoidHazards(gameState, possibleMoves);
 
     // Understand whether it's better to get food or eat smaller snakes
-    let goodMoves = strategize(gameState, possibleMoves);
-
-    if (!goodMoves.length) {
-        // Fall back to any safe move
-        console.log('Fallback', possibleMoves);
-        goodMoves = Object.keys(possibleMoves).filter(key => possibleMoves[key] > AVOID);
-    }
-    // sort moves in ascending order of preference, worst move to best move
-    goodMoves.sort((a, b) => {
-        return possibleMoves[a] - possibleMoves[b];
-    });
-    while (goodMoves.length > 0) {
-        const bestMove = goodMoves.pop();
+    const strategicMoves = strategize(gameState, possibleMoves);
+    const moves = findBestMoves(possibleMoves, strategicMoves);
+    while (moves.length > 0) {
+        const bestMove = moves.pop();
         if (lookAheadLevel < MAX_LOOKAHEAD_LEVEL && lookAhead(gameState, bestMove, lookAheadLevel + 1)) {
             return {
                 possibleMoves,
