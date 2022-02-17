@@ -24,6 +24,9 @@ const AVOID = 0;
 const HAZARD = 0.5;
 const HEAD_THREAT = 0.25;
 
+// Minimum weight for a strategic move
+const MIN_STRAT_WEIGHT = 1;
+
 /** @type {function(import("./types").Coord, import("./types").Coord, PossibleMoves):boolean} */
 const isCollision = (head, coord, possibleMoves, weight = 0) => {
     if (coord.y == head.y) {
@@ -83,7 +86,7 @@ const avoidWalls = (gameState, possibleMoves) => {
 };
 
 /** @type {function(import("./types").GameState, PossibleMoves):Array} */
-const socialize = (gameState, possibleMoves) => {
+const strategize = (gameState, possibleMoves) => {
     const { head, body } = gameState.you;
     let biggest = 0;
 
@@ -141,8 +144,8 @@ const socialize = (gameState, possibleMoves) => {
     console.log('Try to eat', target ? target.id : 'nothing');
 
     let goodMoves = [];
-    if (closestFood) {
-        goodMoves = targetCoord(gameState, possibleMoves, closestFood);
+    if (target) {
+        goodMoves = targetCoord(gameState, possibleMoves, target);
     }
 
     console.log('good moves', goodMoves);
@@ -154,14 +157,14 @@ const targetCoord = (gameState, possibleMoves, t) => {
     const goodMoves = [];
     console.log('TARGET', gameState.you.head, t, possibleMoves);
 
-    if (t.dx < 0 && possibleMoves.left) {
+    if (t.dx < 0 && possibleMoves.left >= MIN_STRAT_WEIGHT) {
         goodMoves.push('left');
-    } else if (t.dx > 0 && possibleMoves.right) {
+    } else if (t.dx > 0 && possibleMoves.right >= MIN_STRAT_WEIGHT) {
         goodMoves.push('right');
     }
-    if (t.dy < 0 && possibleMoves.down) {
+    if (t.dy < 0 && possibleMoves.down >= MIN_STRAT_WEIGHT) {
         goodMoves.push('down');
-    } else if (t.dy > 0 && possibleMoves.up) {
+    } else if (t.dy > 0 && possibleMoves.up >= MIN_STRAT_WEIGHT) {
         goodMoves.push('up');
     }
     return goodMoves;
@@ -237,7 +240,7 @@ function move(gameState, lookAheadLevel = 0) {
     // Use information in gameState to prevent your Battlesnake from colliding with others.
 
     // Understand whether it's better to get food or eat smaller snakes
-    let goodMoves = socialize(gameState, possibleMoves);
+    let goodMoves = strategize(gameState, possibleMoves);
 
     // Finally, choose a move from the available safe moves.
     // TODO: Step 5 - Select a move to make based on strategy, rather than random.
