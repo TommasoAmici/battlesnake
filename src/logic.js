@@ -303,6 +303,7 @@ function move(gameState, lookAheadLevel) {
   // Understand whether it's better to get food or eat smaller snakes
   const strategicMoves = strategize(gameState, possibleMoves);
   const moves = findBestMoves(possibleMoves, strategicMoves);
+  const fallbackMove = moves[moves.length - 1];
   while (moves.length > 0) {
     const bestMove = moves.pop();
     if (
@@ -314,14 +315,13 @@ function move(gameState, lookAheadLevel) {
         possibleMoves,
         bestMove,
       };
-    } else {
-      return {
-        strategicMoves,
-        possibleMoves,
-        bestMove,
-      };
     }
   }
+  return {
+    strategicMoves,
+    possibleMoves,
+    bestMove: fallbackMove,
+  };
 }
 
 /**
